@@ -13,10 +13,19 @@
         private bool disposed; // Flag: Has Dispose already been called?
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="PdSettingsManager"/> class.
+        /// </summary>
+        public PdSettingsManager()
+        {
+            this.SettingsFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), PdSettings.ApplicationName, PdSettings.SettingsFolder, PdSettings.ConfigFile);    // ...\appdata\roaming\<application>\settings\...
+        }
+
+        /// <summary>
         /// Gets or sets a reference of the application settings.
         /// </summary>
-        public AppSettingsMeta JsonObjSettings { get; set; }
+        public AppSettingsMeta? JsonObjSettings { get; set; }
 
+        private string? SettingsFile { get; set; }
 
         /// <summary>
         /// Create the application settings file.
@@ -57,6 +66,66 @@
                 jsonString = JsonSerializer.Serialize(appSettings, getOptions);
 
                 File.WriteAllText(settingsFile, jsonString);
+            }
+        }
+
+        /// <summary>
+        /// Save the sttings to the settings file.
+        /// </summary>
+        /// <param name="jsonObjSettings">Object with all the current settings.</param>
+        public static void SaveSettings(dynamic jsonObjSettings)
+        {
+            if (jsonObjSettings != null)
+            {
+                // Get settings location
+                string fileLocation = jsonObjSettings.AppParam[0].SettingsFileLocation;
+
+                if (string.IsNullOrEmpty(fileLocation))
+                {
+                    // Defaul location
+                    fileLocation = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), PdSettings.ApplicationName, PdSettings.SettingsFolder, PdSettings.ConfigFile);
+                }
+
+                try
+                {
+                    var saveOptions = new JsonSerializerOptions
+                    {
+                        WriteIndented = true,
+                    };
+
+                    string jsonString = JsonSerializer.Serialize(jsonObjSettings, saveOptions);
+
+                    if (!string.IsNullOrEmpty(fileLocation) && !string.IsNullOrEmpty(jsonString))
+                    {
+                        File.WriteAllText(fileLocation, jsonString);
+                    }
+                }
+                catch (AccessViolationException ex)
+                {
+                    throw ex;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Load the application settings.
+        /// The fist time (else) the is no settings file. Default values will be used.
+        /// </summary>
+        public void LoadSettings()
+        {
+            if (File.Exists(this.SettingsFile))
+            {
+                string json = File.ReadAllText(this.SettingsFile);
+                this.JsonObjSettings = JsonSerializer.Deserialize<AppSettingsMeta>(json);
+            }
+            else
+            {
+                if (this.JsonObjSettings != null)
+                {
+                    #pragma warning disable CS8602 // Dereference of a possibly null reference.
+                    this.JsonObjSettings.AppParam[0].SettingsFileLocation = this.SettingsFile;
+                    #pragma warning restore CS8602 // Dereference of a possibly null reference.
+                }
             }
         }
 
@@ -122,8 +191,6 @@
             public bool ResetAllAutoIncrementFields { get; set; }
         }
 
-        #region Dispose
-
         /// <summary>
         /// Implement IDisposable.
         /// </summary>
@@ -153,6 +220,5 @@
 
             this.disposed = true;
         }
-        #endregion Dispose
     }
 }

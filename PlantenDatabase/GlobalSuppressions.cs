@@ -5,7 +5,5 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1124:Do not use regions", Justification = "<Pending>", Scope = "member", Target = "~M:PlantenDatabase.FormMain.#ctor")]
-[assembly: SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1124:Do not use regions", Justification = "<Pending>", Scope = "member", Target = "~M:PlantenDatabase.FormMain.ToolStripMenuItemProgramClose_Click(System.Object,System.EventArgs)")]
 [assembly: SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1404:Code analysis suppression should have justification", Justification = "<Pending>")]
-[assembly: SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1124:Do not use regions", Justification = "<Pending>", Scope = "type", Target = "~T:PlantenDatabase.PdAppEnvironment")]
+[assembly: SuppressMessage("StyleCop.CSharp.OrderingRules", "SA1201:Elements should appear in the correct order", Justification = "<Pending>", Scope = "member", Target = "~M:PlantenDatabase.PdSettingsManager.Dispose")]

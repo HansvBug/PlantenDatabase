@@ -82,7 +82,7 @@
             // 
             this.ToolStripMenuItemProgramClose.Name = "ToolStripMenuItemProgramClose";
             this.ToolStripMenuItemProgramClose.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
-            this.ToolStripMenuItemProgramClose.Size = new System.Drawing.Size(180, 22);
+            this.ToolStripMenuItemProgramClose.Size = new System.Drawing.Size(163, 22);
             this.ToolStripMenuItemProgramClose.Text = "Afsluiten";
             this.ToolStripMenuItemProgramClose.Click += new System.EventHandler(this.ToolStripMenuItemProgramClose_Click);
             // 
@@ -118,7 +118,7 @@
             // ToolStripMenuItemOptionsConfigure
             // 
             this.ToolStripMenuItemOptionsConfigure.Name = "ToolStripMenuItemOptionsConfigure";
-            this.ToolStripMenuItemOptionsConfigure.Size = new System.Drawing.Size(180, 22);
+            this.ToolStripMenuItemOptionsConfigure.Size = new System.Drawing.Size(108, 22);
             this.ToolStripMenuItemOptionsConfigure.Text = "&Opties";
             // 
             // FormMain
@@ -131,6 +131,7 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "FormMain";
             this.Text = "Form1";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
             this.Load += new System.EventHandler(this.FormMain_Load);
             this.StatusStripMain.ResumeLayout(false);
             this.StatusStripMain.PerformLayout();
