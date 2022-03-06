@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "PlantenDatabase": {
+      "commandName": "Project",
+      "commandLineArgs": "Install"
+    }
+  }
+}

@@ -122,9 +122,7 @@
             {
                 if (this.JsonObjSettings != null)
                 {
-                    #pragma warning disable CS8602 // Dereference of a possibly null reference.
                     this.JsonObjSettings.AppParam[0].SettingsFileLocation = this.SettingsFile;
-                    #pragma warning restore CS8602 // Dereference of a possibly null reference.
                 }
             }
         }

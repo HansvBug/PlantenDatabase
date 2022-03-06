@@ -21,7 +21,10 @@ namespace PlantenDatabase
             this.GetSettings();     // Get the settings.
             GetDebugMode();         // DebugMode is a static class.
             this.StartLogging();
+            this.ApplicationAccess = "Start Application";
         }
+
+        private string ApplicationAccess { get; set; }
 
         /// <summary>
         /// Gets or sets the application settings. Holds the user and application setttings.
@@ -104,9 +107,7 @@ namespace PlantenDatabase
         private void StartLogging()
         {
             PdLogging.NameLogFile = PdSettings.LogFileName;
-            #pragma warning disable CS8602 // Dereference of a possibly null reference.
             PdLogging.LogFolder = this.JsonObjSettings.AppParam[0].LogFileLocation;
-            #pragma warning restore CS8602 // Dereference of a possibly null reference.
             PdLogging.AppendLogFile = this.JsonObjSettings.AppParam[0].AppendLogFile;
             PdLogging.ActivateLogging = this.JsonObjSettings.AppParam[0].ActivateLogging;
 
@@ -140,7 +141,66 @@ namespace PlantenDatabase
 
         private void FormMain_Load(object sender, EventArgs e)
         {
-            // load
+            this.CreateDatabase();   // Create the application database file with tables.
+
+            if (this.CheckDatabaseFileExists())
+            {
+                // if the database is not created correct then this.ApplicationAccess = "Minimal" else this.ApplicationAccess = "Start Application"
+                if (this.ApplicationAccess == "Start Application")
+                {
+                    this.ApplicationAccess = "Full";
+                }
+            }
+            else
+            {
+                this.ApplicationAccess = "Minimal";
+            }
+
+            this.EnableFunctions();
+        }
+
+        private void EnableFunctions()
+        {
+            switch (this.ApplicationAccess)
+            {
+                case "Full":
+                    this.ToolStripMenuItemMaintainTables.Enabled = true;
+                    this.ToolStripMenuItemMaintainCompress.Enabled = true;
+                    this.ToolStripMenuItemOptionsConfigure.Enabled = true;
+                    break;
+                case "Minimal":
+                    this.ToolStripMenuItemMaintainTables.Enabled = false;
+                    this.ToolStripMenuItemMaintainCompress.Enabled = false;
+                    this.ToolStripMenuItemOptionsConfigure.Enabled = false;
+                    break;
+                default:
+                    this.ToolStripMenuItemMaintainTables.Enabled = false;
+                    this.ToolStripMenuItemMaintainCompress.Enabled = false;
+                    this.ToolStripMenuItemOptionsConfigure.Enabled = false;
+                    break;
+            }
+        }
+
+        private bool CheckDatabaseFileExists()
+        {
+            string dbLocation = this.JsonObjSettings.AppParam[0].DatabaseLocation;
+            string databaseFileName = Path.Combine(dbLocation, PdSettings.SqlLiteDatabaseName);
+
+            if (File.Exists(databaseFileName))
+            {
+                return true;
+            }
+            else
+            {
+                PdLogging.WriteToLogWarning("De database met de planten gegevens is niet gevonden. De meeste functionaliteit wordt uitgeschakeld.");
+                MessageBox.Show(
+                    "De database met de planten gegevens is niet gevonden." + Environment.NewLine +
+                    "De meeste functionaliteit wordt uitgeschakeld.",
+                    "Informatie.",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+                return false;
+            }
         }
 
         private void ToolStripMenuItemProgramClose_Click(object sender, EventArgs e)
@@ -157,6 +217,28 @@ namespace PlantenDatabase
         private void SaveSettings()
         {
             PdSettingsManager.SaveSettings(this.JsonObjSettings);
+        }
+
+        private void CreateDatabase()
+        {
+            using PdProcessArguments getArg = new();
+            foreach (string arg in getArg.CmdLineArg)
+            {
+                string argument = Convert.ToString(arg, CultureInfo.InvariantCulture);
+
+                if (argument == getArg.ArgIntall)
+                {
+                    PdApplicationDatabaseCreate createAppDb = new();
+                    if (createAppDb.CreateDatabase())
+                    {
+                        this.ApplicationAccess = "Full";
+                    }
+                    else
+                    {
+                        this.ApplicationAccess = "Minimal";
+                    }
+                }
+            }
         }
     }
 }
