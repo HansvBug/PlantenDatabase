@@ -9,6 +9,7 @@
     public class PdApplicationDatabaseCreate : PdSqliteDatabaseConnection
     {
         private int latestDbVersion;
+        private bool TablesExisits = true;
 
         public PdApplicationDatabaseCreate()
         {
@@ -30,12 +31,12 @@
                                 "ID                 INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT ," +
                                 "GUID               VARCHAR(50)     ," +
                                 "CODE               VARCHAR(10)     ," +
-                                "WET_NAAM           VARCHAR(100)    ," +
+                                "NAAM               VARCHAR(100)    ," +
                                 "NED_NAAM           VARCHAR(100)    ," +
                                 "DATUM_AANGEMAAKT   DATE            ," +
                                 "DATE_GEWIJZIGD     DATE            ," +
                                 "AANGEMAAKT_DOOR    VARCHAR(100)    ," +
-                                "GEMUTEERD_DOOR     VARCHAR(100))    ";
+                                "GEWIJZIGD_DOOR     VARCHAR(100))    ";
 
         private readonly string createTblDomainIndex = string.Format("CREATE UNIQUE INDEX IF NOT EXISTS {0} ON {1}(ID)", PdTableName.PD_DOMEIN_ID_IDX, PdTableName.PD_DOMEIN);
 
@@ -43,12 +44,12 @@
                                 "ID             INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT ," +
                                 "GUID           VARCHAR(50)         ," +
                                 "CODE           VARCHAR(10)         ," +
-                                "WET_NAAM       VARCHAR(100)        ," +
+                                "NAAM           VARCHAR(100)        ," +
                                 "DOMEIN_ID      INTEGER             ," +
                                 "DATUM_AANGEMAAKT   DATE            ," +
                                 "DATE_GEWIJZIGD     DATE            ," +
                                 "AANGEMAAKT_DOOR    VARCHAR(100)    ," +
-                                "GEMUTEERD_DOOR     VARCHAR(100)    ," +
+                                "GEWIJZIGD_DOOR     VARCHAR(100)    ," +
                                 string.Format("FOREIGN KEY (DOMEIN_ID) REFERENCES {0}(ID) ", PdTableName.PD_DOMEIN) +
                                 "ON UPDATE RESTRICT " +
                                 "ON DELETE RESTRICT )";
@@ -59,12 +60,12 @@
                                 "ID                 INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT ," +
                                 "GUID               VARCHAR(50)     ," +
                                 "CODE               VARCHAR(10)     ," +
-                                "WET_NAAM           VARCHAR(100)    ," +
+                                "NAAM               VARCHAR(100)    ," +
                                 "RIJK_ID            INTEGER         ," +
                                 "DATUM_AANGEMAAKT   DATE            ," +
                                 "DATE_GEWIJZIGD     DATE            ," +
                                 "AANGEMAAKT_DOOR    VARCHAR(100)    ," +
-                                "GEMUTEERD_DOOR     VARCHAR(100)    ," +
+                                "GEWIJZIGD_DOOR     VARCHAR(100)    ," +
                                 string.Format("FOREIGN KEY (RIJK_ID) REFERENCES {0}(ID) ", PdTableName.PD_RIJK) +
                                 "ON UPDATE RESTRICT " +
                                 "ON DELETE RESTRICT )";
@@ -75,12 +76,12 @@
                                 "ID                 INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT ," +
                                 "GUID               VARCHAR(50)     ," +
                                 "CODE               VARCHAR(10)     ," +
-                                "WET_NAAM           VARCHAR(100)    ," +
+                                "NAAM               VARCHAR(100)    ," +
                                 "STAM_ID            INTEGER         ," +
                                 "DATUM_AANGEMAAKT   DATE            ," +
                                 "DATE_GEWIJZIGD     DATE            ," +
                                 "AANGEMAAKT_DOOR    VARCHAR(100)    ," +
-                                "GEMUTEERD_DOOR     VARCHAR(100)    ," +
+                                "GEWIJZIGD_DOOR     VARCHAR(100)    ," +
                                 string.Format("FOREIGN KEY (STAM_ID) REFERENCES {0}(ID) ", PdTableName.PD_STAM) +
                                 "ON UPDATE RESTRICT " +
                                 "ON DELETE RESTRICT )";
@@ -91,12 +92,12 @@
                                 "ID                 INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT ," +
                                 "GUID               VARCHAR(50)     ," +
                                 "CODE               VARCHAR(10)     ," +
-                                "WET_NAAM           VARCHAR(100)    ," +
+                                "NAAM               VARCHAR(100)    ," +
                                 "KLASSE_ID          INTEGER         ," +
                                 "DATUM_AANGEMAAKT   DATE            ," +
                                 "DATE_GEWIJZIGD     DATE            ," +
                                 "AANGEMAAKT_DOOR    VARCHAR(100)    ," +
-                                "GEMUTEERD_DOOR     VARCHAR(100)    ," +
+                                "GEWIJZIGD_DOOR     VARCHAR(100)    ," +
                                 string.Format("FOREIGN KEY (KLASSE_ID) REFERENCES {0}(ID) ", PdTableName.PD_KLASSE) +
                                 "ON UPDATE RESTRICT " +
                                 "ON DELETE RESTRICT )";
@@ -107,13 +108,13 @@
                                 "ID                 INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT ," +
                                 "GUID               VARCHAR(50)     ," +
                                 "CODE               VARCHAR(10)     ," +
-                                "WET_NAME           VARCHAR(100)    ," +
+                                "NAAM               VARCHAR(100)    ," +
                                 "NED_NAME           VARCHAR(100)    ," +
                                 "ORDE_ID            INTEGER         ," +
                                 "DATUM_AANGEMAAKT   DATE            ," +
                                 "DATE_GEWIJZIGD     DATE            ," +
                                 "AANGEMAAKT_DOOR    VARCHAR(100)    ," +
-                                "GEMUTEERD_DOOR     VARCHAR(100)    ," +
+                                "GEWIJZIGD_DOOR     VARCHAR(100)    ," +
                                 string.Format("FOREIGN KEY (ORDE_ID) REFERENCES {0}(ID) ", PdTableName.PD_ORDE) +
                                 "ON UPDATE RESTRICT " +
                                 "ON DELETE RESTRICT )";
@@ -124,12 +125,12 @@
                                 "ID                 INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT ," +
                                 "GUID               VARCHAR(50)     ," +
                                 "CODE               VARCHAR(10)     ," +
-                                "WET_NAAM           VARCHAR(100)    ," +
+                                "NAAM               VARCHAR(100)    ," +
                                 "FAMILIE_ID         INTEGER         ," +
                                 "DATUM_AANGEMAAKT   DATE            ," +
                                 "DATE_GEWIJZIGD     DATE            ," +
                                 "AANGEMAAKT_DOOR    VARCHAR(100)    ," +
-                                "GEMUTEERD_DOOR     VARCHAR(100)    ," +
+                                "GEWIJZIGD_DOOR     VARCHAR(100)    ," +
                                 string.Format("FOREIGN KEY (FAMILIE_ID) REFERENCES {0}(ID) ", PdTableName.PD_FAMILIE) +
                                 "ON UPDATE RESTRICT " +
                                  "ON DELETE RESTRICT )";
@@ -142,7 +143,7 @@
                                 "DATUM_AANGEMAAKT   DATE            ," +
                                 "DATE_GEWIJZIGD     DATE            ," +
                                 "AANGEMAAKT_DOOR    VARCHAR(100)    ," +
-                                "GEMUTEERD_DOOR     VARCHAR(100))    ";
+                                "GEWIJZIGD_DOOR     VARCHAR(100))    ";
 
         private readonly string createTblSoilType = string.Format("CREATE TABLE IF NOT EXISTS {0} (", PdTableName.PD_GRONDSOORT) +
                                 "ID                 INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT ," +
@@ -152,7 +153,7 @@
                                 "DATUM_AANGEMAAKT   DATE            ," +
                                 "DATE_GEWIJZIGD     DATE            ," +
                                 "AANGEMAAKT_DOOR    VARCHAR(100)    ," +
-                                "GEMUTEERD_DOOR     VARCHAR(100))    ";
+                                "GEWIJZIGD_DOOR     VARCHAR(100))    ";
 
         private readonly string createTblColor = string.Format("CREATE TABLE IF NOT EXISTS {0} (", PdTableName.PD_KLEUR) +
                                 "ID                 INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT ," +
@@ -162,7 +163,7 @@
                                 "DATUM_AANGEMAAKT   DATE            ," +
                                 "DATE_GEWIJZIGD     DATE            ," +
                                 "AANGEMAAKT_DOOR    VARCHAR(100)    ," +
-                                "GEMUTEERD_DOOR     VARCHAR(100))    ";
+                                "GEWIJZIGD_DOOR     VARCHAR(100))    ";
 
         private readonly string createTblCategory = string.Format("CREATE TABLE IF NOT EXISTS {0} (", PdTableName.PD_CATEGORIE) +
                                 "ID                 INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT ," +
@@ -172,7 +173,7 @@
                                 "DATUM_AANGEMAAKT   DATE            ," +
                                 "DATE_GEWIJZIGD     DATE            ," +
                                 "AANGEMAAKT_DOOR    VARCHAR(100)    ," +
-                                "GEMUTEERD_DOOR     VARCHAR(100))    ";
+                                "GEWIJZIGD_DOOR     VARCHAR(100))    ";
 
         private readonly string createTblShape = string.Format("CREATE TABLE IF NOT EXISTS {0} (", PdTableName.PD_VORM) +
                                 "ID                 INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT ," +
@@ -182,12 +183,13 @@
                                 "DATUM_AANGEMAAKT   DATE            ," +
                                 "DATE_GEWIJZIGD     DATE            ," +
                                 "AANGEMAAKT_DOOR    VARCHAR(100)    ," +
-                                "GEMUTEERD_DOOR     VARCHAR(100))    ";
+                                "GEWIJZIGD_DOOR     VARCHAR(100))    ";
 
         private readonly string createTblGenusIndex = string.Format("CREATE UNIQUE INDEX IF NOT EXISTS {0} ON {1}(ID)", PdTableName.PD_GESLACHT_ID_IDX, PdTableName.PD_GESLACHT);
 
         private readonly string createPlantData = string.Format("CREATE TABLE IF NOT EXISTS {0} (", PdTableName.PD_PLANTENDATA) +
                                 "ID                 INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT ," +
+                                "GUID               VARCHAR(50)         ," +
                                 "CODE               VARCHAR(10)         ," +
                                 "GESLACHT_ID        INTEGER NOT NULL    ," +
                                 "SOORT              VARCHAR(100)        ," +
@@ -225,13 +227,16 @@
                                 "DATUM_AANGEMAAKT   DATE                ," +
                                 "DATE_GEWIJZIGD     DATE                ," +
                                 "AANGEMAAKT_DOOR    VARCHAR(100)        ," +
-                                "GEMUTEERD_DOOR     VARCHAR(100))        ";
+                                "GEWIJZIGD_DOOR     VARCHAR(100))        ";
 
         private void ErrorMessage()
         {
             if (!this.Error)
             {
-                MessageBox.Show("De database is aangemaakt.", "Informatie", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                if (!this.TablesExisits)
+                {
+                    MessageBox.Show("De database is aangemaakt.", "Informatie", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
             else
             {
@@ -394,7 +399,16 @@
                     dr.Read();
                     if (dr.HasRows)
                     {
-                        sqlLiteMetaVersion = int.Parse(dr[0].ToString(), CultureInfo.InvariantCulture);
+                        if (!string.IsNullOrEmpty(dr[0].ToString()))
+                        {
+                            sqlLiteMetaVersion = int.Parse(dr[0].ToString(), CultureInfo.InvariantCulture);
+                        }
+                        else
+                        {
+                            sqlLiteMetaVersion = -1;
+                            PdLogging.WriteToLogError("Fout bij ophalen database versie. return versie: -1");
+                            MessageBox.Show("Fout bij ophalen database versie.", "Fout", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }                        
                     }
 
                     dr.Close();
@@ -569,6 +583,7 @@
                 this.EnableFK();
 
                 string version = "1";
+
                 this.CreateTable(this.creTblSettingsMeta, PdTableName.SETTINGS_META, version);
 
                 this.CreateTable(this.createTblDomain, PdTableName.PD_DOMEIN, version);
@@ -593,6 +608,7 @@
                 this.CreateIndex(this.createTblFamilyIndex, PdTableName.PD_FAMILIE_ID_IDX, version);
                 this.CreateIndex(this.createTblGenusIndex, PdTableName.PD_GESLACHT_ID_IDX, version);
 
+                TablesExisits = false;
                 this.InsertMeta(version);  // Set the version 1
             }
 
@@ -600,7 +616,7 @@
             this.DbConnection.Dispose();
 
             this.ErrorMessage();
-            if (!this.Error)
+            if (!this.Error && TablesExisits)
             {
                 return true;
             }

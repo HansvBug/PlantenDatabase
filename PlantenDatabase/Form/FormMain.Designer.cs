@@ -100,12 +100,14 @@
             this.ToolStripMenuItemMaintainTables.Name = "ToolStripMenuItemMaintainTables";
             this.ToolStripMenuItemMaintainTables.Size = new System.Drawing.Size(191, 22);
             this.ToolStripMenuItemMaintainTables.Text = "&Tabellen";
+            this.ToolStripMenuItemMaintainTables.Click += new System.EventHandler(this.ToolStripMenuItemMaintainTables_Click);
             // 
             // ToolStripMenuItemMaintainCompress
             // 
             this.ToolStripMenuItemMaintainCompress.Name = "ToolStripMenuItemMaintainCompress";
             this.ToolStripMenuItemMaintainCompress.Size = new System.Drawing.Size(191, 22);
             this.ToolStripMenuItemMaintainCompress.Text = "Comprimeer &database";
+            this.ToolStripMenuItemMaintainCompress.Click += new System.EventHandler(this.ToolStripMenuItemMaintainCompress_Click);
             // 
             // ToolStripMenuItemOptions
             // 
@@ -125,6 +127,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.SystemColors.Window;
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.StatusStripMain);
             this.Controls.Add(this.menuStrip1);

@@ -16,12 +16,13 @@ namespace PlantenDatabase
 
             this.Text = PdSettings.ApplicationName;
             this.SetStatusLabelMain = "Welkom.";
-            CheckAppEnvironment();  // Check if the application path exists. If not then it will be created.
-            CreateSettingsFile();   // Create a settings file with default values. (If the file does not exists).
-            this.GetSettings();     // Get the settings.
-            GetDebugMode();         // DebugMode is a static class.
+            CheckAppEnvironment();      // Check if the application path exists. If not then it will be created.
+            CreateSettingsFile();       // Create a settings file with default values. (If the file does not exists).
+            this.GetSettings();         // Get the settings.
+            GetDebugMode();             // DebugMode is a static class.
             this.StartLogging();
             this.ApplicationAccess = "Start Application";
+            this.LoadFormPosition();    // Load the last saved form position.
         }
 
         private string ApplicationAccess { get; set; }
@@ -139,6 +140,11 @@ namespace PlantenDatabase
             }
         }
 
+        private void LoadFormPosition()
+        {
+            using PdFormPosition frmPosition = new(this);
+            frmPosition.LoadMainFormPosition();
+        }
         private void FormMain_Load(object sender, EventArgs e)
         {
             this.CreateDatabase();   // Create the application database file with tables.
@@ -210,8 +216,15 @@ namespace PlantenDatabase
 
         private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
         {
+            this.SaveFormPosition();
             this.SaveSettings();
             PdLogging.StopLogging();
+        }
+
+        private void SaveFormPosition()
+        {
+            using PdFormPosition frmPosition = new(this);
+            frmPosition.SaveMainFormPosition();
         }
 
         private void SaveSettings()
@@ -239,6 +252,63 @@ namespace PlantenDatabase
                     }
                 }
             }
+        }
+
+        private void ToolStripMenuItemMaintainCompress_Click(object sender, EventArgs e)
+        {
+            this.SetStatusLabelMain = "Bezig met het comprimeren van de database...";
+            Cursor.Current = Cursors.WaitCursor;
+            PdLogging.WriteToLogInformation(string.Format("Het bestand {0} wordt gecomprimeerd...", PdSettings.SqlLiteDatabaseName));
+
+            try
+            {
+                string pathString = Path.Combine(this.JsonObjSettings.AppParam[0].DatabaseLocation, PdSettings.BackUpFolder, PdSettings.SqlLiteDatabaseName);
+
+                PdApplicationDatabaseMaintain compress = new PdApplicationDatabaseMaintain();
+                if (!compress.IsDatabaseLocked())
+                {
+                    compress.Compress();
+                }
+            }
+            catch (Exception ex)
+            {
+                PdLogging.WriteToLogInformation(string.Format("Onverwachte fout opgetreden bij het comprimeren van '{0}'.", PdSettings.SqlLiteDatabaseName));
+                PdLogging.WriteToLogInformation("Melding :");
+                PdLogging.WriteToLogInformation(ex.Message);
+                if (PdDebugMode.DebugMode)
+                {
+                    PdLogging.WriteToLogDebug(ex.ToString());
+                }
+
+                this.SetStatusLabelMain = "Onverwachte fout opgetreden bij het comprimeren van de database.";
+                this.Refresh();
+                Cursor.Current = Cursors.Default;
+
+                MessageBox.Show(
+                    string.Format("Fout opgetreden bij het comprimeren van {0}.", PdSettings.SqlLiteDatabaseName) + Environment.NewLine +
+                    Environment.NewLine +
+                    "Raadpleeg het log bestand.",
+                    "Fout.",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+            finally
+            {
+                this.SetStatusLabelMain = string.Empty;
+                this.Refresh();
+                Cursor.Current = Cursors.Default;
+            }
+
+            Cursor.Current = Cursors.Default;
+        }
+
+        private void ToolStripMenuItemMaintainTables_Click(object sender, EventArgs e)
+        {
+            this.SaveSettings();
+            FormTableMaintenance frm = new FormTableMaintenance();
+            frm.ShowDialog(this);
+            frm.Dispose();
+            this.GetSettings();
         }
     }
 }

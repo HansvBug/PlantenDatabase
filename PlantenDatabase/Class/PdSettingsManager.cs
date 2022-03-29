@@ -60,6 +60,28 @@
                             ResetAllAutoIncrementFields = true,
                         },
                     },
+                    FormMain = new List<FormMainParams>()
+                    {
+                        new FormMainParams()
+                        {
+                            FrmX = 200,  //default = 200
+                            FrmY = 100,
+                            FrmHeight = 580,
+                            FrmWidth = 815,
+                            FrmWindowState = FormWindowState.Normal
+                        }
+                    },
+                    FormTableMaintenance = new List<FormTableMaintenanceParams>()
+                    {
+                        new FormTableMaintenanceParams()
+                        {
+                            FrmX = 20,
+                            FrmY = 20,
+                            FrmHeight = 470,
+                            FrmWidth = 790,
+                            FrmWindowState = FormWindowState.Normal
+                        }
+                    },
                 };
 
                 string jsonString;
@@ -136,6 +158,8 @@
             /// Gets or sets a list with application settings.
             /// </summary>
             public List<AppParams>? AppParam { get; set; }
+            public List<FormMainParams>? FormMain { get; set; }
+            public List<FormTableMaintenanceParams>? FormTableMaintenance { get; set; }
         }
 
         /// <summary>
@@ -190,6 +214,32 @@
         }
 
         /// <summary>
+        /// The Main Form parameters/settings.
+        /// </summary>
+        public class FormMainParams
+        {
+            //system.drawing.rectangle = 10; 10; 700; 500 ==> x, y, width, height
+            public int FrmX { get; set; }
+            public int FrmY { get; set; }
+            public int FrmHeight { get; set; }
+            public int FrmWidth { get; set; }
+            public FormWindowState FrmWindowState { get; set; }
+        }
+
+        /// <summary>
+        /// The maintain Tables Form parameters/settings.
+        /// </summary>
+        public class FormTableMaintenanceParams
+        {
+            public int FrmX { get; set; }
+            public int FrmY { get; set; }
+            public int FrmHeight { get; set; }
+            public int FrmWidth { get; set; }
+            public FormWindowState FrmWindowState { get; set; }
+        }
+
+        #region dispose
+        /// <summary>
         /// Implement IDisposable.
         /// </summary>
         public void Dispose()
@@ -218,5 +268,6 @@
 
             this.disposed = true;
         }
+        #endregion dispose
     }
 }
