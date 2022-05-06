@@ -7,12 +7,12 @@
     /// </summary>
     public class PdDatabaseTable
     {
-        private string? text;
+        private string text;
 
         /// <summary>
         /// Gets or sets the tablename.
         /// </summary>
-        public string? TableName { get; set; }
+        public string TableName { get; set; }
 
         /// <summary>
         /// Gets or sets the id.
@@ -28,6 +28,11 @@
             set { this.text = value; }
         }
 
+        public PdDatabaseTable()
+        {
+            this.text = string.Empty;
+            this.TableName = string.Empty;
+        }
         private static string VisibleTableName(string tblName)
         {
             if (tblName == PdTableName.PD_DOMEIN)

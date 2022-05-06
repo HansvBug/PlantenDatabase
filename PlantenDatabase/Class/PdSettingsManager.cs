@@ -82,6 +82,18 @@
                             FrmWindowState = FormWindowState.Normal
                         }
                     },
+                    FormConfigure = new List<FormConfigureParams>()
+                    {
+                        new FormConfigureParams()
+                        {
+                            FrmX = 20,
+                            FrmY = 20,
+                            FrmHeight = 490,
+                            FrmWidth = 815,
+                            FrmWindowState = FormWindowState.Normal,
+                            FolderImportLocation = String.Empty
+                        }
+                    },
                 };
 
                 string jsonString;
@@ -160,6 +172,8 @@
             public List<AppParams>? AppParam { get; set; }
             public List<FormMainParams>? FormMain { get; set; }
             public List<FormTableMaintenanceParams>? FormTableMaintenance { get; set; }
+
+            public List<FormConfigureParams>? FormConfigure { get; set; }
         }
 
         /// <summary>
@@ -237,6 +251,19 @@
             public int FrmWidth { get; set; }
             public FormWindowState FrmWindowState { get; set; }
         }
+
+        /// <summary>
+        /// The Form Configure parameters/settings.
+        /// </summary>
+        public class FormConfigureParams
+        {
+            public int FrmX { get; set; }
+            public int FrmY { get; set; }
+            public int FrmHeight { get; set; }
+            public int FrmWidth { get; set; }
+            public FormWindowState FrmWindowState { get; set; }
+            public string FolderImportLocation { get; set; }
+    }
 
         #region dispose
         /// <summary>

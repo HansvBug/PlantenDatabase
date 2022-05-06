@@ -9,12 +9,13 @@
     public class PdApplicationDatabaseCreate : PdSqliteDatabaseConnection
     {
         private int latestDbVersion;
-        private bool TablesExisits = true;
+        private bool TablesExisits;
 
         public PdApplicationDatabaseCreate()
         {
             this.Error = false;
             this.latestDbVersion = PdSettings.DatabaseVersion;
+            TablesExisits = true;
         }
 
         /// <summary>
@@ -30,160 +31,244 @@
         private readonly string createTblDomain = string.Format("CREATE TABLE IF NOT EXISTS {0} (", PdTableName.PD_DOMEIN) +
                                 "ID                 INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT ," +
                                 "GUID               VARCHAR(50)     ," +
-                                "CODE               VARCHAR(10)     ," +
+                                "CODE               VARCHAR(15)     ," +        //LET OP
                                 "NAAM               VARCHAR(100)    ," +
                                 "NED_NAAM           VARCHAR(100)    ," +
                                 "DATUM_AANGEMAAKT   DATE            ," +
-                                "DATE_GEWIJZIGD     DATE            ," +
+                                "DATUM_GEWIJZIGD    DATE            ," +
                                 "AANGEMAAKT_DOOR    VARCHAR(100)    ," +
                                 "GEWIJZIGD_DOOR     VARCHAR(100))    ";
+
+        private readonly string createTrAfterInsTblDomain = "CREATE TRIGGER prefix_domein_code_after_insert " +
+                                string.Format("after insert on {0} ", PdTableName.PD_DOMEIN) +
+                                string.Format("begin update {0} ", PdTableName.PD_DOMEIN) +
+                                "set CODE = 'DOM_'||substr('0000000000'||new.ID, -15, 15) " +   //LET OP
+                                "WHERE ID = new.ID; " +
+                                "end";
 
         private readonly string createTblDomainIndex = string.Format("CREATE UNIQUE INDEX IF NOT EXISTS {0} ON {1}(ID)", PdTableName.PD_DOMEIN_ID_IDX, PdTableName.PD_DOMEIN);
 
         private readonly string createTblKingdom = string.Format("CREATE TABLE IF NOT EXISTS {0} (", PdTableName.PD_RIJK) +
                                 "ID             INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT ," +
                                 "GUID           VARCHAR(50)         ," +
-                                "CODE           VARCHAR(10)         ," +
+                                "CODE           VARCHAR(15)         ," +
                                 "NAAM           VARCHAR(100)        ," +
                                 "DOMEIN_ID      INTEGER             ," +
                                 "DATUM_AANGEMAAKT   DATE            ," +
-                                "DATE_GEWIJZIGD     DATE            ," +
+                                "DATUM_GEWIJZIGD    DATE            ," +
                                 "AANGEMAAKT_DOOR    VARCHAR(100)    ," +
                                 "GEWIJZIGD_DOOR     VARCHAR(100)    ," +
                                 string.Format("FOREIGN KEY (DOMEIN_ID) REFERENCES {0}(ID) ", PdTableName.PD_DOMEIN) +
                                 "ON UPDATE RESTRICT " +
                                 "ON DELETE RESTRICT )";
 
+        private readonly string createTrAfterInsTblKingdom = "CREATE TRIGGER prefix_rijk_code_after_insert " +
+                                string.Format("after insert on {0} ", PdTableName.PD_RIJK) +
+                                string.Format("begin update {0} ", PdTableName.PD_RIJK) +
+                                "set CODE = 'RIJK_'||substr('000000000'||new.ID, -15, 15) " +
+                                "WHERE ID = new.ID; " +
+                                "end";
+
         private readonly string createTblKingdomIndex = string.Format("CREATE UNIQUE INDEX IF NOT EXISTS {0} ON {1}(ID)", PdTableName.PD_RIJK_ID_IDX, PdTableName.PD_RIJK);
 
         private readonly string createTblDivision = string.Format("CREATE TABLE IF NOT EXISTS {0} (", PdTableName.PD_STAM) +
                                 "ID                 INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT ," +
                                 "GUID               VARCHAR(50)     ," +
-                                "CODE               VARCHAR(10)     ," +
+                                "CODE               VARCHAR(15)     ," +
                                 "NAAM               VARCHAR(100)    ," +
                                 "RIJK_ID            INTEGER         ," +
                                 "DATUM_AANGEMAAKT   DATE            ," +
-                                "DATE_GEWIJZIGD     DATE            ," +
+                                "DATUM_GEWIJZIGD    DATE            ," +
                                 "AANGEMAAKT_DOOR    VARCHAR(100)    ," +
                                 "GEWIJZIGD_DOOR     VARCHAR(100)    ," +
                                 string.Format("FOREIGN KEY (RIJK_ID) REFERENCES {0}(ID) ", PdTableName.PD_RIJK) +
                                 "ON UPDATE RESTRICT " +
                                 "ON DELETE RESTRICT )";
 
+        private readonly string createTrAfterInsTblDivision = "CREATE TRIGGER prefix_stam_code_after_insert " +
+                                string.Format("after insert on {0} ", PdTableName.PD_STAM) +
+                                string.Format("begin update {0} ", PdTableName.PD_STAM) +
+                                "set CODE = 'STAM_'||substr('000000000'||new.ID, -15, 15) " +
+                                "WHERE ID = new.ID; " +
+                                "end";
+
         private readonly string createTblDivisionIndex = string.Format("CREATE UNIQUE INDEX IF NOT EXISTS {0} ON {1}(ID)", PdTableName.PD_STAM_ID_IDX, PdTableName.PD_STAM);
 
         private readonly string createTblClass = string.Format("CREATE TABLE IF NOT EXISTS {0} (", PdTableName.PD_KLASSE) +
                                 "ID                 INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT ," +
                                 "GUID               VARCHAR(50)     ," +
-                                "CODE               VARCHAR(10)     ," +
+                                "CODE               VARCHAR(15)     ," +
                                 "NAAM               VARCHAR(100)    ," +
                                 "STAM_ID            INTEGER         ," +
                                 "DATUM_AANGEMAAKT   DATE            ," +
-                                "DATE_GEWIJZIGD     DATE            ," +
+                                "DATUM_GEWIJZIGD    DATE            ," +
                                 "AANGEMAAKT_DOOR    VARCHAR(100)    ," +
                                 "GEWIJZIGD_DOOR     VARCHAR(100)    ," +
                                 string.Format("FOREIGN KEY (STAM_ID) REFERENCES {0}(ID) ", PdTableName.PD_STAM) +
                                 "ON UPDATE RESTRICT " +
                                 "ON DELETE RESTRICT )";
 
+        private readonly string createTrAfterInsTblClass = "CREATE TRIGGER prefix_klasse_code_after_insert " +
+                                string.Format("after insert on {0} ", PdTableName.PD_KLASSE) +
+                                string.Format("begin update {0} ", PdTableName.PD_KLASSE) +
+                                "set CODE = 'KLAS_'||substr('000000000'||new.ID, -15, 15) " +
+                                "WHERE ID = new.ID; " +
+                                "end";
+
         private readonly string createTblClassIndex = string.Format("CREATE UNIQUE INDEX IF NOT EXISTS {0} ON {1}(ID)", PdTableName.PD_KLASSE_ID_IDX, PdTableName.PD_KLASSE);
 
         private readonly string createTblOrder = string.Format("CREATE TABLE IF NOT EXISTS {0} (", PdTableName.PD_ORDE) +
                                 "ID                 INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT ," +
                                 "GUID               VARCHAR(50)     ," +
-                                "CODE               VARCHAR(10)     ," +
+                                "CODE               VARCHAR(15)     ," +
                                 "NAAM               VARCHAR(100)    ," +
                                 "KLASSE_ID          INTEGER         ," +
                                 "DATUM_AANGEMAAKT   DATE            ," +
-                                "DATE_GEWIJZIGD     DATE            ," +
+                                "DATUM_GEWIJZIGD    DATE            ," +
                                 "AANGEMAAKT_DOOR    VARCHAR(100)    ," +
                                 "GEWIJZIGD_DOOR     VARCHAR(100)    ," +
                                 string.Format("FOREIGN KEY (KLASSE_ID) REFERENCES {0}(ID) ", PdTableName.PD_KLASSE) +
                                 "ON UPDATE RESTRICT " +
                                 "ON DELETE RESTRICT )";
 
+        private readonly string createTrAfterInsTblOrder = "CREATE TRIGGER prefix_orde_code_after_insert " +
+                                string.Format("after insert on {0} ", PdTableName.PD_ORDE) +
+                                string.Format("begin update {0} ", PdTableName.PD_ORDE) +
+                                "set CODE = 'ORDE_'||substr('000000000'||new.ID, -15, 15) " +
+                                "WHERE ID = new.ID; " +
+                                "end";
+
         private readonly string createTblOrderIndex = string.Format("CREATE UNIQUE INDEX IF NOT EXISTS {0} ON {1}(ID)", PdTableName.PD_ORDE_ID_IDX, PdTableName.PD_ORDE);
 
         private readonly string createTblFamily = string.Format("CREATE TABLE IF NOT EXISTS {0} (", PdTableName.PD_FAMILIE) +
                                 "ID                 INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT ," +
                                 "GUID               VARCHAR(50)     ," +
-                                "CODE               VARCHAR(10)     ," +
+                                "CODE               VARCHAR(15)     ," +
                                 "NAAM               VARCHAR(100)    ," +
-                                "NED_NAME           VARCHAR(100)    ," +
+                                "NED_NAAM           VARCHAR(100)    ," +
                                 "ORDE_ID            INTEGER         ," +
                                 "DATUM_AANGEMAAKT   DATE            ," +
-                                "DATE_GEWIJZIGD     DATE            ," +
+                                "DATUM_GEWIJZIGD    DATE            ," +
                                 "AANGEMAAKT_DOOR    VARCHAR(100)    ," +
                                 "GEWIJZIGD_DOOR     VARCHAR(100)    ," +
                                 string.Format("FOREIGN KEY (ORDE_ID) REFERENCES {0}(ID) ", PdTableName.PD_ORDE) +
                                 "ON UPDATE RESTRICT " +
                                 "ON DELETE RESTRICT )";
 
+        private readonly string createTrAfterInsTblFamily = "CREATE TRIGGER prefix_familie_code_after_insert " +
+                                string.Format("after insert on {0} ", PdTableName.PD_FAMILIE) +
+                                string.Format("begin update {0} ", PdTableName.PD_FAMILIE) +
+                                "set CODE = 'FAM_'||substr('0000000000'||new.ID, -15, 15) " +
+                                "WHERE ID = new.ID; " +
+                                "end";
+
         private readonly string createTblFamilyIndex = string.Format("CREATE UNIQUE INDEX IF NOT EXISTS {0} ON {1}(ID)", PdTableName.PD_FAMILIE_ID_IDX, PdTableName.PD_FAMILIE);
 
         private readonly string createTblGenus = string.Format("CREATE TABLE IF NOT EXISTS {0} (", PdTableName.PD_GESLACHT) +
                                 "ID                 INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT ," +
                                 "GUID               VARCHAR(50)     ," +
-                                "CODE               VARCHAR(10)     ," +
+                                "CODE               VARCHAR(15)     ," +
                                 "NAAM               VARCHAR(100)    ," +
                                 "FAMILIE_ID         INTEGER         ," +
                                 "DATUM_AANGEMAAKT   DATE            ," +
-                                "DATE_GEWIJZIGD     DATE            ," +
+                                "DATUM_GEWIJZIGD    DATE            ," +
                                 "AANGEMAAKT_DOOR    VARCHAR(100)    ," +
                                 "GEWIJZIGD_DOOR     VARCHAR(100)    ," +
                                 string.Format("FOREIGN KEY (FAMILIE_ID) REFERENCES {0}(ID) ", PdTableName.PD_FAMILIE) +
                                 "ON UPDATE RESTRICT " +
                                  "ON DELETE RESTRICT )";
 
+        private readonly string createTrAfterInsTblGenus = "CREATE TRIGGER prefix_geslacht_code_after_insert " +
+                                string.Format("after insert on {0} ", PdTableName.PD_GESLACHT) +
+                                string.Format("begin update {0} ", PdTableName.PD_GESLACHT) +
+                                "set CODE = 'GESL_'||substr('000000000'||new.ID, -15, 15) " +
+                                "WHERE ID = new.ID; " +
+                                "end";
+
         private readonly string createTblLocation = string.Format("CREATE TABLE IF NOT EXISTS {0} (", PdTableName.PD_STANDPLAATS) +
                                 "ID                 INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT ," +
                                 "GUID               VARCHAR(50)     ," +
-                                "CODE               VARCHAR(10)     ," +
+                                "CODE               VARCHAR(15)     ," +
                                 "NAAM               VARCHAR(100)    ," +
                                 "DATUM_AANGEMAAKT   DATE            ," +
-                                "DATE_GEWIJZIGD     DATE            ," +
+                                "DATUM_GEWIJZIGD    DATE            ," +
                                 "AANGEMAAKT_DOOR    VARCHAR(100)    ," +
                                 "GEWIJZIGD_DOOR     VARCHAR(100))    ";
+
+        private readonly string createTrAfterInsTblLocation = "CREATE TRIGGER prefix_standplaats_code_after_insert " +
+                                string.Format("after insert on {0} ", PdTableName.PD_STANDPLAATS) +
+                                string.Format("begin update {0} ", PdTableName.PD_STANDPLAATS) +
+                                "set CODE = 'LOC_'||substr('0000000000'||new.ID, -15, 15) " +
+                                "WHERE ID = new.ID; " +
+                                "end";
 
         private readonly string createTblSoilType = string.Format("CREATE TABLE IF NOT EXISTS {0} (", PdTableName.PD_GRONDSOORT) +
                                 "ID                 INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT ," +
                                 "GUID               VARCHAR(50)     ," +
-                                "CODE               VARCHAR(10)     ," +
+                                "CODE               VARCHAR(15)     ," +
                                 "NAAM               VARCHAR(100)    ," +
                                 "DATUM_AANGEMAAKT   DATE            ," +
-                                "DATE_GEWIJZIGD     DATE            ," +
+                                "DATUM_GEWIJZIGD    DATE            ," +
                                 "AANGEMAAKT_DOOR    VARCHAR(100)    ," +
                                 "GEWIJZIGD_DOOR     VARCHAR(100))    ";
+
+        private readonly string createTrAfterInsTblSoilType = "CREATE TRIGGER prefix_grondsoort_code_after_insert " +
+                                string.Format("after insert on {0} ", PdTableName.PD_GRONDSOORT) +
+                                string.Format("begin update {0} ", PdTableName.PD_GRONDSOORT) +
+                                "set CODE = 'GROND_'||substr('00000000'||new.ID, -15, 15) " +
+                                "WHERE ID = new.ID; " +
+                                "end";
 
         private readonly string createTblColor = string.Format("CREATE TABLE IF NOT EXISTS {0} (", PdTableName.PD_KLEUR) +
                                 "ID                 INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT ," +
                                 "GUID               VARCHAR(50)     ," +
-                                "CODE               VARCHAR(10)     ," +
+                                "CODE               VARCHAR(15)     ," +
                                 "NAAM               VARCHAR(100)    ," +
                                 "DATUM_AANGEMAAKT   DATE            ," +
-                                "DATE_GEWIJZIGD     DATE            ," +
+                                "DATUM_GEWIJZIGD    DATE            ," +
                                 "AANGEMAAKT_DOOR    VARCHAR(100)    ," +
                                 "GEWIJZIGD_DOOR     VARCHAR(100))    ";
+
+        private readonly string createTrAfterInsTblColor = "CREATE TRIGGER prefix_kleur_code_after_insert " +
+                                string.Format("after insert on {0} ", PdTableName.PD_KLEUR) +
+                                string.Format("begin update {0} ", PdTableName.PD_KLEUR) +
+                                "set CODE = 'KLEUR_'||substr('00000000'||new.ID, -15, 15) " +
+                                "WHERE ID = new.ID; " +
+                                "end";
 
         private readonly string createTblCategory = string.Format("CREATE TABLE IF NOT EXISTS {0} (", PdTableName.PD_CATEGORIE) +
                                 "ID                 INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT ," +
                                 "GUID               VARCHAR(50)     ," +
-                                "CODE               VARCHAR(10)     ," +
+                                "CODE               VARCHAR(15)     ," +
                                 "NAAM               VARCHAR(100)    ," +
                                 "DATUM_AANGEMAAKT   DATE            ," +
-                                "DATE_GEWIJZIGD     DATE            ," +
+                                "DATUM_GEWIJZIGD    DATE            ," +
                                 "AANGEMAAKT_DOOR    VARCHAR(100)    ," +
                                 "GEWIJZIGD_DOOR     VARCHAR(100))    ";
+
+        private readonly string createTrAfterInsTblCategory = "CREATE TRIGGER prefix_categorie_code_after_insert " +
+                                string.Format("after insert on {0} ", PdTableName.PD_CATEGORIE) +
+                                string.Format("begin update {0} ", PdTableName.PD_CATEGORIE) +
+                                "set CODE = 'CAT_'||substr('0000000000'||new.ID, -15, 15) " +
+                                "WHERE ID = new.ID; " +
+                                "end";
 
         private readonly string createTblShape = string.Format("CREATE TABLE IF NOT EXISTS {0} (", PdTableName.PD_VORM) +
                                 "ID                 INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT ," +
                                 "GUID               VARCHAR(50)     ," +
-                                "CODE               VARCHAR(10)     ," +
+                                "CODE               VARCHAR(15)     ," +
                                 "NAAM               VARCHAR(100)    ," +
                                 "DATUM_AANGEMAAKT   DATE            ," +
-                                "DATE_GEWIJZIGD     DATE            ," +
+                                "DATUM_GEWIJZIGD    DATE            ," +
                                 "AANGEMAAKT_DOOR    VARCHAR(100)    ," +
                                 "GEWIJZIGD_DOOR     VARCHAR(100))    ";
+
+        private readonly string createTrAfterInsTblShape = "CREATE TRIGGER prefix_vorm_code_after_insert " +
+                                string.Format("after insert on {0} ", PdTableName.PD_VORM) +
+                                string.Format("begin update {0} ", PdTableName.PD_VORM) +
+                                "set CODE = 'VORM_'||substr('000000000'||new.ID, -15, 15) " +
+                                "WHERE ID = new.ID; " +
+                                "end";
 
         private readonly string createTblGenusIndex = string.Format("CREATE UNIQUE INDEX IF NOT EXISTS {0} ON {1}(ID)", PdTableName.PD_GESLACHT_ID_IDX, PdTableName.PD_GESLACHT);
 
@@ -225,7 +310,7 @@
                                 "TOELICHTING        VARCHAR(1500)       ," +
                                 "EIGEN_TUIN         BOOL                ," +
                                 "DATUM_AANGEMAAKT   DATE                ," +
-                                "DATE_GEWIJZIGD     DATE                ," +
+                                "DATUM_GEWIJZIGD    DATE                ," +
                                 "AANGEMAAKT_DOOR    VARCHAR(100)        ," +
                                 "GEWIJZIGD_DOOR     VARCHAR(100))        ";
 
@@ -415,7 +500,7 @@
                 }
                 catch (SQLiteException ex)
                 {
-                    PdLogging.WriteToLogError("Opvragen meta versie is misukt. (Versie " + Convert.ToString(this.latestDbVersion, CultureInfo.InvariantCulture) + ").");
+                    PdLogging.WriteToLogError("Opvragen meta versie is mislukt. (Versie " + Convert.ToString(this.latestDbVersion, CultureInfo.InvariantCulture) + ").");
                     PdLogging.WriteToLogError("Melding :");
                     PdLogging.WriteToLogError(ex.Message);
                     if (PdDebugMode.DebugMode)
@@ -453,7 +538,7 @@
                 }
                 catch (SQLiteException ex)
                 {
-                    PdLogging.WriteToLogError(string.Format("Het invoeren van het database versienummer in de tabel {0} is misukt. (Versie " + Convert.ToString(this.latestDbVersion, CultureInfo.InvariantCulture) + ").", PdTableName.SETTINGS_META));
+                    PdLogging.WriteToLogError(string.Format("Het invoeren van het database versienummer in de tabel {0} is mislukt. (Versie " + Convert.ToString(this.latestDbVersion, CultureInfo.InvariantCulture) + ").", PdTableName.SETTINGS_META));
                     PdLogging.WriteToLogError(ex.Message);
                     if (PdDebugMode.DebugMode)
                     {
@@ -492,7 +577,7 @@
             }
             catch (SQLiteException ex)
             {
-                PdLogging.WriteToLogError(string.Format("het wijzigen van de versie in tabel {0} is misukt. (Versie " + version + ").", PdTableName.SETTINGS_META));
+                PdLogging.WriteToLogError(string.Format("het wijzigen van de versie in tabel {0} is mislukt. (Versie " + version + ").", PdTableName.SETTINGS_META));
                 PdLogging.WriteToLogError(ex.Message);
                 if (PdDebugMode.DebugMode)
                 {
@@ -516,7 +601,7 @@
                 }
                 catch (SQLiteException ex)
                 {
-                    PdLogging.WriteToLogError(string.Format("Aanmaken van de tabel {0} is misukt. (Versie {1}).", tableName, version));
+                    PdLogging.WriteToLogError(string.Format("Aanmaken van de tabel {0} is mislukt. (Versie {1}).", tableName, version));
                     PdLogging.WriteToLogError("Melding :");
                     PdLogging.WriteToLogError(ex.Message);
                     if (PdDebugMode.DebugMode)
@@ -549,7 +634,7 @@
                 }
                 catch (SQLiteException ex)
                 {
-                    PdLogging.WriteToLogError(string.Format("Aanmaken van de index {0} is misukt. (Versie {1}).", indexName, version));
+                    PdLogging.WriteToLogError(string.Format("Aanmaken van de index {0} is mislukt. (Versie {1}).", indexName, version));
                     PdLogging.WriteToLogError("Melding :");
                     PdLogging.WriteToLogError(ex.Message);
                     if (PdDebugMode.DebugMode)
@@ -567,6 +652,39 @@
             else
             {
                 PdLogging.WriteToLogError(string.Format("Het aanmaken van de index {0} is niet uitgevoerd.", indexName));
+            }
+        }
+
+        private void CreateTrigger(string sqlCreTrigger, string triggerName, string version)
+        {
+            if (!this.Error)
+            {
+                SQLiteCommand command = new(sqlCreTrigger, this.DbConnection);
+                try
+                {
+                    command.ExecuteNonQuery();
+                    PdLogging.WriteToLogInformation(string.Format("De trigger {0} is aangemaakt. (Versie {1}).", triggerName, version));
+                }
+                catch (SQLiteException ex)
+                {
+                    PdLogging.WriteToLogError(string.Format("Aanmaken van de trigger {0} is mislukt. (Versie {1}).", triggerName, version));
+                    PdLogging.WriteToLogError("Melding :");
+                    PdLogging.WriteToLogError(ex.Message);
+                    if (PdDebugMode.DebugMode)
+                    {
+                        PdLogging.WriteToLogDebug(ex.ToString());
+                    }
+
+                    this.Error = true;
+                }
+                finally
+                {
+                    command.Dispose();
+                }
+            }
+            else
+            {
+                PdLogging.WriteToLogError(string.Format("Het aanmaken van de trigger {0} is niet uitgevoerd.", triggerName));
             }
         }
 
@@ -608,7 +726,21 @@
                 this.CreateIndex(this.createTblFamilyIndex, PdTableName.PD_FAMILIE_ID_IDX, version);
                 this.CreateIndex(this.createTblGenusIndex, PdTableName.PD_GESLACHT_ID_IDX, version);
 
-                TablesExisits = false;
+                this.CreateTrigger(this.createTrAfterInsTblDomain, "prefix_domein_code_after_insert", version);
+                this.CreateTrigger(this.createTrAfterInsTblKingdom, "prefix_rijk_code_after_insert", version);
+                this.CreateTrigger(this.createTrAfterInsTblDivision, "prefix_stam_code_after_insert", version);
+
+                this.CreateTrigger(this.createTrAfterInsTblClass, "prefix_klasse_code_after_insert", version);
+                this.CreateTrigger(this.createTrAfterInsTblOrder, "prefix_orde_code_after_insert", version);
+                this.CreateTrigger(this.createTrAfterInsTblFamily, "prefix_familie_code_after_insert", version);
+                this.CreateTrigger(this.createTrAfterInsTblGenus, "prefix_geslacht_code_after_insert", version);
+                this.CreateTrigger(this.createTrAfterInsTblLocation, "prefix_standplaats_code_after_insert", version);
+                this.CreateTrigger(this.createTrAfterInsTblSoilType, "prefix_grondsoort_code_after_insert", version);
+                this.CreateTrigger(this.createTrAfterInsTblColor, "prefix_kleur_code_after_insert", version);
+                this.CreateTrigger(this.createTrAfterInsTblCategory, "prefix_categorie_code_after_insert", version);
+                this.CreateTrigger(this.createTrAfterInsTblShape, "prefix_vorm_code_after_insert", version);
+
+                this.TablesExisits = false;
                 this.InsertMeta(version);  // Set the version 1
             }
 
@@ -616,7 +748,7 @@
             this.DbConnection.Dispose();
 
             this.ErrorMessage();
-            if (!this.Error && TablesExisits)
+            if (!this.Error && this.TablesExisits)
             {
                 return true;
             }

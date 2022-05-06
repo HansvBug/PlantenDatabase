@@ -89,6 +89,7 @@
             this.ButtonImport.TabIndex = 3;
             this.ButtonImport.Text = "&Import csv";
             this.ButtonImport.UseVisualStyleBackColor = true;
+            this.ButtonImport.Click += new System.EventHandler(this.ButtonImport_Click);
             // 
             // ButtonCancel
             // 
@@ -110,10 +111,10 @@
             this.ButtonSave.TabIndex = 1;
             this.ButtonSave.Text = "Op&slaan";
             this.ButtonSave.UseVisualStyleBackColor = true;
+            this.ButtonSave.Click += new System.EventHandler(this.ButtonSave_Click);
             // 
             // DataGridViewTables
             // 
-            this.DataGridViewTables.AllowUserToAddRows = false;
             this.DataGridViewTables.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.DataGridViewTables.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;

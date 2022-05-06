@@ -11,15 +11,14 @@
         public PdSqliteDatabaseConnection()
         {
             this.LoadSettings();
-            try
+            if (this.JsonObjSettings != null)
             {
-                this.DbLocation = this.JsonObjSettings.AppParam[0].DatabaseLocation;
-                this.DatabaseFileName = Path.Combine(this.DbLocation, PdSettings.SqlLiteDatabaseName);
-                this.DbConnection = new SQLiteConnection("Data Source=" + this.DatabaseFileName);
-            }
-            catch
-            {
-                // empty. gets here when the app is started for the first time and there is no Settings file.
+                if (!string.IsNullOrEmpty(this.JsonObjSettings.AppParam[0].DatabaseLocation))
+                {
+                    this.DbLocation = this.JsonObjSettings.AppParam[0].DatabaseLocation;
+                    this.DatabaseFileName = Path.Combine(this.DbLocation, PdSettings.SqlLiteDatabaseName);
+                    this.DbConnection = new SQLiteConnection("Data Source=" + this.DatabaseFileName);
+                }
             }
         }
 
@@ -31,12 +30,12 @@
         /// <summary>
         /// Gets or sets the name of the database file.
         /// </summary>
-        protected string? DatabaseFileName { get; set; }
+        protected string DatabaseFileName { get; set; } = String.Empty;
 
         /// <summary>
         /// Gets or sets the name of the database file location.
         /// </summary>
-        protected string? DbLocation { get; set; }
+        protected string DbLocation { get; set; } = String.Empty;
 
         /// <summary>
         /// Gets or sets the appliction settings.

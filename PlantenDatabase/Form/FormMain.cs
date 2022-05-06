@@ -310,5 +310,14 @@ namespace PlantenDatabase
             frm.Dispose();
             this.GetSettings();
         }
+
+        private void ToolStripMenuItemOptionsConfigure_Click(object sender, EventArgs e)
+        {
+            this.SaveSettings();
+            FormConfigure frm = new FormConfigure();
+            frm.ShowDialog(this);
+            frm.Dispose();
+            this.GetSettings();
+        }
     }
 }

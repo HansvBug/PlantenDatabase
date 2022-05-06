@@ -10,6 +10,7 @@
 
         private readonly FormMain? MainForm;
         private readonly FormTableMaintenance? TableMaintenanceForm;
+        private readonly FormConfigure? ConfigureForm;
         private dynamic? JsonObjSettings { get; set; }
 
 
@@ -23,6 +24,12 @@
         {
             this.TableMaintenanceForm = TableMaintenanceForm;
             this.JsonObjSettings = TableMaintenanceForm.JsonObjSettings;
+        }
+
+        public PdFormPosition(FormConfigure ConfigureForm)
+        {
+            this.ConfigureForm = ConfigureForm;
+            this.JsonObjSettings = ConfigureForm.JsonObjSettings;
         }
 
         #region Helper
@@ -130,6 +137,7 @@
 
         #endregion FormMain
 
+        #region MaintainTablesForm
         public void LoadMaintainTablesFormPosition()
         {
             if (PdDebugMode.DebugMode)
@@ -211,6 +219,90 @@
                 }
             }
         }
+        #endregion maintainTablesForm
+
+        #region FormConfigure
+        public void LoadConfigureFormPosition()
+        {
+            if (PdDebugMode.DebugMode)
+            {
+                PdLogging.WriteToLogInformation("Ophalen scherm positie scherm Instellingen.");
+            }
+
+            this.ConfigureForm.WindowState = FormWindowState.Normal;
+            this.ConfigureForm.StartPosition = FormStartPosition.WindowsDefaultBounds;
+
+            if (this.JsonObjSettings != null && this.JsonObjSettings.FormConfigure != null)
+            {
+                Rectangle FrmRect = new()
+                {
+                    X = this.JsonObjSettings.FormConfigure[0].FrmX,
+                    Y = this.JsonObjSettings.FormConfigure[0].FrmY,
+                    Width = this.JsonObjSettings.FormConfigure[0].FrmWidth,
+                    Height = this.JsonObjSettings.FormConfigure[0].FrmHeight,
+                };
+
+                if (FrmRect != Rectangle.Empty && IsVisibleOnAnyScreen(FrmRect))
+                {
+                    this.ConfigureForm.StartPosition = FormStartPosition.Manual;
+                    this.ConfigureForm.DesktopBounds = FrmRect;
+
+                    this.ConfigureForm.WindowState = this.JsonObjSettings.FormConfigure[0].FrmWindowState;
+                }
+                else
+                {
+                    this.ConfigureForm.StartPosition = FormStartPosition.WindowsDefaultLocation;
+
+                    if (FrmRect != Rectangle.Empty)
+                    {
+                        this.ConfigureForm.Size = FrmRect.Size;
+                    }
+                }
+            }
+        }
+        public void SaveConfigureFormPosition()
+        {
+            if (PdDebugMode.DebugMode)
+            {
+                PdLogging.WriteToLogInformation("Opslaan scherm positie scherm Instellingen.");
+            }
+
+            string SettingsFile = this.JsonObjSettings.AppParam[0].SettingsFileLocation;
+
+            if (File.Exists(SettingsFile))
+            {
+                if (this.ConfigureForm.WindowState == FormWindowState.Normal)
+                {
+                    this.JsonObjSettings.FormConfigure[0].FrmWindowState = FormWindowState.Normal;
+
+                    if (this.ConfigureForm.Location.X >= 0)
+                    {
+                        this.JsonObjSettings.FormConfigure[0].FrmX = this.ConfigureForm.Location.X;
+                    }
+                    else
+                    {
+                        this.JsonObjSettings.FormConfigure[0].FrmX = 0;
+                    }
+
+                    if (this.ConfigureForm.Location.Y >= 0)
+                    {
+                        this.JsonObjSettings.FormConfigure[0].FrmY = this.ConfigureForm.Location.Y;
+                    }
+                    else
+                    {
+                        this.JsonObjSettings.FormConfigure[0].FrmY = 0;
+                    }
+
+                    this.JsonObjSettings.FormConfigure[0].FrmHeight = this.ConfigureForm.Height;
+                    this.JsonObjSettings.FormConfigure[0].FrmWidth = this.ConfigureForm.Width;
+                }
+                else
+                {
+                    this.JsonObjSettings.FormConfigure[0].FrmWindowState = this.ConfigureForm.WindowState;
+                }
+            }
+        }
+        #endregion FormConfigure
 
         #region dispose
         /// <summary>

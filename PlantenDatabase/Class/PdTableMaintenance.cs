@@ -9,21 +9,51 @@
 
     public class PdTableMaintenance : PdSqliteDatabaseConnection
     {
-        private readonly DataGridView? dgv;
-        private BindingSource? BndSource;
-        private PdDatabaseTable? dbTable;
+        private readonly DataGridView dgv = new();
+        private PdDatabaseTable dbTable = new();
         private PdDatabaseTables dbTables = new();
-        private const string TrvRootNodeName = "Tabellen";
 
         /// <summary>
-        /// Hold the selected data table.
+        /// Default treeview rootnode name.
         /// </summary>
-        public DataTable? Dt;
+        public const string TrvRootNodeName = "Tabellen";
+
+        private BindingSource bndSource = new();
 
         /// <summary>
-        /// DataAdapeter, used for updating the selected table.
+        /// Get or set the bindingsource.
         /// </summary>
-        public SQLiteDataAdapter Da = new();
+        public BindingSource BndSource
+        {
+            get { return this.bndSource; }
+            set { this.bndSource = value; }
+        }
+
+        private DataTable dt = new();
+
+        /// <summary>
+        /// Gets or sets the selected data table.
+        /// </summary>
+        public DataTable Dt
+        {
+            get { return this.dt; }
+            set { if (value != null)
+                {
+                    this.dt = value;
+                }
+            }
+        }
+
+        private SQLiteDataAdapter da = new();
+
+        /// <summary>
+        /// Gets or sets the DataAdapeter used for updating the selected table.
+        /// </summary>
+        public SQLiteDataAdapter Da
+        {
+            get { return this.da; }
+            set { this.da = value; }
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PdTableMaintenance"/> class.
@@ -33,7 +63,7 @@
         public PdTableMaintenance(DataGridView dgv, BindingSource bndSource)
         {
             this.dgv = dgv;
-            this.BndSource = bndSource;
+            this.BndSource = bndSource; 
         }
 
         /// <summary>
@@ -50,7 +80,7 @@
         /// </summary>
         public void GetAllTableNames()
         {
-            string selectSql = "SELECT name FROM sqlite_master WHERE type = 'table' and name not like 'sqlite_%' and name != '" + PdTableName.SETTINGS_META + "'";
+            string selectSql = string.Format("SELECT name FROM sqlite_master WHERE type = 'table' and name not like 'sqlite_%' and name not in ('{0}', '{1}')", PdTableName.SETTINGS_META, PdTableName.PD_PLANTENDATA);
 
             try
             {
@@ -230,6 +260,7 @@
 
             // Create extra row with a null value so you don't have to insert a ID value in xxxx_ID
             ordeTable.Columns["ID"].AllowDBNull = true;
+
             DataRow newRow = ordeTable.NewRow();
             newRow["NAAM"] = " ";
             newRow["ID"] = DBNull.Value;
@@ -256,7 +287,7 @@
                 SQLiteDataReader reader = command.ExecuteReader();
 
                 using (DataTable dt = new())
-                {
+                {                   
                     dt.Load(reader);
                     foreach (DataRow row in dt.Rows)
                     {
@@ -278,6 +309,198 @@
 
                 MessageBox.Show("Fout bij het ophalen van de tabel gegevens.", "Fout.", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return temp;
+            }
+            finally
+            {
+                this.DbConnection.Close();
+            }
+        }
+
+        /// <summary>
+        /// Check for relations between tables and update if needed.
+        /// </summary>
+        public void CheckForUpdatedRelations()
+        {
+            this.UpdClassDevision();
+            this.UpdDivisionKingom();
+            this.UpdFamilyOrder();
+            this.UpdGenusFamily();
+            this.UpdKingdomDomain();
+            this.UpdOrderClass();
+        }
+
+        private void UpdClassDevision()
+        {
+            string updateSql = string.Format("update {0} set STAM_ID = null where STAM_ID not in (select id from {1})", PdTableName.PD_KLASSE, PdTableName.PD_STAM);
+
+            try
+            {
+                this.DbConnection.Open();
+                using var tr = this.DbConnection.BeginTransaction();
+                SQLiteCommand command = new(updateSql, this.DbConnection);
+                command.ExecuteNonQuery();
+                command.Dispose();
+                tr.Commit();
+            }
+            catch (Exception ex)
+            {
+                PdLogging.WriteToLogError(string.Format("Fout bij het update van STAM_ID in de tabel {0}.", PdTableName.PD_KLASSE));
+                PdLogging.WriteToLogError(ex.Message);
+                if (PdDebugMode.DebugMode)
+                {
+                    PdLogging.WriteToLogError(ex.ToString());
+                }
+
+                MessageBox.Show("Fout bij het ophalen van alle tabelnamen.", "Fout.", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                this.DbConnection.Close();
+            }
+        }
+
+        private void UpdDivisionKingom()
+        {
+            string updateSql = string.Format("update {0} set RIJK_ID = null where RIJK_ID not in (select id from {1})", PdTableName.PD_STAM, PdTableName.PD_RIJK);
+            try
+            {
+                this.DbConnection.Open();
+                using var tr = this.DbConnection.BeginTransaction();
+                SQLiteCommand command = new(updateSql, this.DbConnection);
+                command.ExecuteNonQuery();
+                command.Dispose();
+                tr.Commit();
+            }
+            catch (Exception ex)
+            {
+                PdLogging.WriteToLogError(string.Format("Fout bij het update van RIJK_ID in de tabel {0}.", PdTableName.PD_STAM));
+                PdLogging.WriteToLogError(ex.Message);
+                if (PdDebugMode.DebugMode)
+                {
+                    PdLogging.WriteToLogError(ex.ToString());
+                }
+
+                MessageBox.Show("Fout bij het ophalen van alle tabelnamen.", "Fout.", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                this.DbConnection.Close();
+            }
+        }
+
+        private void UpdFamilyOrder()
+        {
+            string updateSql = string.Format("update {0} set ORDE_ID = null where ORDE_ID not in (select id from {1})", PdTableName.PD_FAMILIE, PdTableName.PD_ORDE);
+
+            try
+            {
+                this.DbConnection.Open();
+                using var tr = this.DbConnection.BeginTransaction();
+                SQLiteCommand command = new(updateSql, this.DbConnection);
+                command.ExecuteNonQuery();
+                command.Dispose();
+                tr.Commit();
+            }
+            catch (Exception ex)
+            {
+                PdLogging.WriteToLogError(string.Format("Fout bij het update van ORDE_ID in de tabel {0}.", PdTableName.PD_FAMILIE));
+                PdLogging.WriteToLogError(ex.Message);
+                if (PdDebugMode.DebugMode)
+                {
+                    PdLogging.WriteToLogError(ex.ToString());
+                }
+
+                MessageBox.Show("Fout bij het ophalen van alle tabelnamen.", "Fout.", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                this.DbConnection.Close();
+            }
+        }
+
+        private void UpdGenusFamily()
+        {
+            string updateSql = string.Format("update {0} set FAMILIE_ID = null where FAMILIE_ID not in (select id from {1})", PdTableName.PD_GESLACHT, PdTableName.PD_FAMILIE);
+
+            try
+            {
+                this.DbConnection.Open();
+                using var tr = this.DbConnection.BeginTransaction();
+                SQLiteCommand command = new(updateSql, this.DbConnection);
+                command.ExecuteNonQuery();
+                command.Dispose();
+                tr.Commit();
+            }
+            catch (Exception ex)
+            {
+                PdLogging.WriteToLogError(string.Format("Fout bij het update van FAMILIE_ID in de tabel {0}.", PdTableName.PD_GESLACHT));
+                PdLogging.WriteToLogError(ex.Message);
+                if (PdDebugMode.DebugMode)
+                {
+                    PdLogging.WriteToLogError(ex.ToString());
+                }
+
+                MessageBox.Show("Fout bij het ophalen van alle tabelnamen.", "Fout.", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                this.DbConnection.Close();
+            }
+        }
+
+        private void UpdKingdomDomain()
+        {
+            string updateSql = string.Format("update {0} set DOMEIN_ID = null where DOMEIN_ID not in (select id from {1})", PdTableName.PD_RIJK, PdTableName.PD_DOMEIN);
+
+            try
+            {
+                this.DbConnection.Open();
+                using var tr = this.DbConnection.BeginTransaction();
+                SQLiteCommand command = new(updateSql, this.DbConnection);
+                command.ExecuteNonQuery();
+                command.Dispose();
+                tr.Commit();
+            }
+            catch (Exception ex)
+            {
+                PdLogging.WriteToLogError(string.Format("Fout bij het update van DOMEIN_ID inde tabel {0}.", PdTableName.PD_RIJK));
+                PdLogging.WriteToLogError(ex.Message);
+                if (PdDebugMode.DebugMode)
+                {
+                    PdLogging.WriteToLogError(ex.ToString());
+                }
+
+                MessageBox.Show("Fout bij het ophalen van alle tabelnamen.", "Fout.", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                this.DbConnection.Close();
+            }
+        }
+
+        private void UpdOrderClass()
+        {
+            string updateSql = string.Format("update {0} set KLASSE_ID = null where KLASSE_ID not in (select id from {1})", PdTableName.PD_ORDE, PdTableName.PD_KLASSE);
+
+            try
+            {
+                this.DbConnection.Open();
+                using var tr = this.DbConnection.BeginTransaction();
+                SQLiteCommand command = new(updateSql, this.DbConnection);
+                command.ExecuteNonQuery();
+                command.Dispose();
+                tr.Commit();
+            }
+            catch (Exception ex)
+            {
+                PdLogging.WriteToLogError(string.Format("Fout bij het update van KLASSE_ID in de tabel {0}.", PdTableName.PD_ORDE));
+                PdLogging.WriteToLogError(ex.Message);
+                if (PdDebugMode.DebugMode)
+                {
+                    PdLogging.WriteToLogError(ex.ToString());
+                }
+
+                MessageBox.Show("Fout bij het ophalen van alle tabelnamen.", "Fout.", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {

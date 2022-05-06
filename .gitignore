@@ -362,3 +362,8 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /PlantenDatabase_Tedoen.txt
+/Lijsten/Complete_lijst
+/Lijsten/Familie_Genus_Orde.xlsx
+/Lijsten/Lijsten.xlsx
+/Lijsten/Genus_Geslacht.csv
+/Lijsten/WFOTaxonomicBackbone_v.1.3_20211209.zip

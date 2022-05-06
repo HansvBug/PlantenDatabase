@@ -120,8 +120,9 @@
             // ToolStripMenuItemOptionsConfigure
             // 
             this.ToolStripMenuItemOptionsConfigure.Name = "ToolStripMenuItemOptionsConfigure";
-            this.ToolStripMenuItemOptionsConfigure.Size = new System.Drawing.Size(108, 22);
+            this.ToolStripMenuItemOptionsConfigure.Size = new System.Drawing.Size(180, 22);
             this.ToolStripMenuItemOptionsConfigure.Text = "&Opties";
+            this.ToolStripMenuItemOptionsConfigure.Click += new System.EventHandler(this.ToolStripMenuItemOptionsConfigure_Click);
             // 
             // FormMain
             // 
